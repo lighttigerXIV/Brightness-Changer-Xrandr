@@ -1,6 +1,8 @@
 # Brightness-Changer-Xrandr
 This is a script to change the laptop brightness.
-I created this, because my backlight doesn't have drivers for linux and because of that i was forced to develope this little script.
+I created this, because my backlight doesn't have drivers for linux and because of that i made this 2 little scripts that will help you if you are in a situation like me.
+
+It can up the brightness of your display, it can lower the brightness and has the option of night mode that will reduce the blue light from the screen
 
 
 # How to install it
