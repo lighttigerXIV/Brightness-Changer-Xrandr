@@ -1,0 +1,137 @@
+#!/bin/python
+
+import os
+import sys
+import json
+import subprocess as sp
+
+
+configPath = os.path.expanduser('~') + "/.config/brightness.json"
+
+#Gets current monitor
+def getMonitor():
+
+    output =  sp.getoutput( "xrandr | grep \" connected\"" ).split()
+    
+    return output[0]
+
+
+#Checks if config file already exists
+def checkFile():
+
+    if( not os.path.exists( configPath ) ):
+
+        #creates a json file with the default settings
+        defaultSettings = { "brightness" : 100, "night-mode" : "off" }
+
+        json_string = json.dumps(defaultSettings)
+        
+        configFile = open( configPath, "w" )
+
+        configFile.write(json_string)
+
+        configFile.close()
+
+
+#Gets the data from the config file
+def getConfigData():
+
+    with open( configPath ) as data:
+        configData = json.load(data)
+    
+    return configData
+
+
+def writeConfig( brightness, nightMode ):
+
+    settings = { "brightness" : brightness, "night-mode" : nightMode }
+
+    json_string = json.dumps(settings)
+        
+    configFile = open( configPath, "w" )
+
+    configFile.write(json_string)
+
+    configFile.close()
+
+
+
+monitor = getMonitor()
+
+
+def main():
+    if( len(sys.argv) > 1 ):
+        
+        option = sys.argv[1]
+
+        checkFile()
+
+        configData = getConfigData()
+
+        currentBrightness = int(configData["brightness"])
+        currentNightMode = configData["night-mode"]
+
+        if( currentNightMode == "on" ):
+
+            convertedNightMode = " --gamma 1:1:0.8"
+
+        else:
+
+            convertedNightMode = " --gamma 1:1:1"
+
+        
+        #If the option is to up the brightness
+        if( option == "up" ):
+
+            if( currentBrightness < 100 ):
+
+                newBrightness = currentBrightness + 10
+                convertedBrightness = round( newBrightness / 100, 1 )
+                
+                os.system( "xrandr --output " + monitor + " --brightness " + str(convertedBrightness) + convertedNightMode)
+
+                writeConfig( newBrightness, currentNightMode )
+        
+        #If the option is to lower the brightness
+        elif( option == "down" ):
+
+            if( currentBrightness > 40 ):
+                newBrightness = currentBrightness - 10
+                convertedBrightness = round( newBrightness / 100, 1 )
+                
+                os.system( "xrandr --output " + monitor + " --brightness " + str(convertedBrightness) + convertedNightMode )
+
+                writeConfig( newBrightness, currentNightMode ) 
+
+        #If the option is to enable or disable night mode
+        elif( option == "night" ):
+
+            convertedBrightness = round( currentBrightness / 100, 1 )
+
+            #Turns on the night mode
+            if( currentNightMode == "off" ):
+
+                convertedNightMode = " --gamma 1:1:0.8"
+                os.system( "xrandr --output " + monitor + " --brightness " + str(convertedBrightness) + convertedNightMode )
+
+                writeConfig( currentBrightness, "on" )
+
+            #Turns off the night mode
+            else:
+
+                convertedNightMode = " --gamma 1:1:1"
+                os.system( "xrandr --output " + monitor + " --brightness " + str(convertedBrightness) + convertedNightMode )
+
+                writeConfig( currentBrightness, "off" )
+
+        else:
+
+            print("Argument not acepted")
+
+    else:
+
+        print ("This script needs arguments")
+
+
+if __name__ == "__main__":
+    main()

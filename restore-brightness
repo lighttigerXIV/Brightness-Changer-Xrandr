@@ -1,0 +1,72 @@
+#!/bin/python
+
+import os
+import sys
+import json
+import subprocess as sp
+
+configPath = os.path.expanduser('~') + "/.config/brightness.json"
+
+#Gets current monitor
+def getMonitor():
+
+    output =  sp.getoutput( "xrandr | grep \" connected\"" ).split()
+    
+    return output[0]
+
+#Checks if config file already exists
+def checkFile():
+
+    if( not os.path.exists( configPath ) ):
+
+        #creates a json file with the default settings
+        defaultSettings = { "brightness" : 100, "night-mode" : "off" }
+
+        json_string = json.dumps(defaultSettings)
+        
+        configFile = open( configPath, "w" )
+
+        configFile.write(json_string)
+
+        configFile.close()
+
+#Gets the data from the config file
+def getConfigData():
+
+    with open( configPath ) as data:
+        configData = json.load(data)
+    
+    return configData
+
+
+monitor = getMonitor()
+
+
+def main():
+
+    checkFile()
+
+    configData = getConfigData()
+
+    brightness = int(configData["brightness"])
+    nightMode = configData["night-mode"]
+
+    #If night mode is on
+    if( nightMode == "on" ):
+
+            convertedNightMode = " --gamma 1:1:0.8"
+
+    #if night mode is off
+    else:
+
+        convertedNightMode = " --gamma 1:1:1"
+
+
+    convertedBrightness = round( brightness / 100, 1 )
+
+    os.system( "xrandr --output " + monitor + " --brightness " + str(convertedBrightness) + convertedNightMode )
+    
+
+
+if __name__ == "__main__":
+    main()
