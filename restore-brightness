@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import subprocess as sp
+import time
 
 configPath = os.path.expanduser('~') + "/.config/brightness.json"
 
@@ -44,6 +45,7 @@ monitor = getMonitor()
 
 def main():
 
+    time.sleep(1) #needed for starting after xrandr
     checkFile()
 
     configData = getConfigData()
