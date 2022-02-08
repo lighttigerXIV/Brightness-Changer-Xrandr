@@ -7,6 +7,8 @@ It can up the brightness of your display, it can lower the brightness and has th
 
 # How to install it
 
+Note: if  **#!/bin/python** doesn't exist use **#!/bin/python3**
+
 * Go to your downloads folder and open the terminal there.
 * Run this following commands:
 
